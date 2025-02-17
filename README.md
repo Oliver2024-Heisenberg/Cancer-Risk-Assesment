@@ -1,2 +1,151 @@
 # Cancer-Risk-Assesment
 Remember that this tool should be used for educational purposes only and should include appropriate medical disclaimers in your actual implementation. Please contact a doctor for Proper Assesment
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancer Risk Assessment Tool</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        #results {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="card p-4 shadow-sm">
+            <h1 class="text-center text-primary">Cancer Risk Assessment Tool</h1>
+            <div class="alert alert-warning" role="alert">
+                This tool is for educational purposes only. Consult a doctor for medical advice.
+            </div>
+            <form id="riskForm">
+                <div class="mb-3">
+                    <label for="age" class="form-label">Age:</label>
+                    <input type="number" id="age" class="form-control" required min="0" max="120">
+                </div>
+                <div class="mb-3">
+                    <label for="weight" class="form-label">Weight (kg):</label>
+                    <input type="number" id="weight" class="form-control" required min="0">
+                </div>
+                <div class="mb-3">
+                    <label for="height" class="form-label">Height (cm):</label>
+                    <input type="number" id="height" class="form-control" required min="0">
+                </div>
+                <div class="mb-3">
+                    <label for="smoker" class="form-label">Do you smoke?</label>
+                    <select id="smoker" class="form-select" required>
+                        <option value="">Select an option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="former">Former smoker</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="familyHistory" class="form-label">Family history of cancer?</label>
+                    <select id="familyHistory" class="form-select" required>
+                        <option value="">Select an option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="sunExposure" class="form-label">Sun exposure level:</label>
+                    <select id="sunExposure" class="form-select" required>
+                        <option value="">Select level</option>
+                        <option value="low">Low</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="exercise" class="form-label">Regular exercise?</label>
+                    <select id="exercise" class="form-select" required>
+                        <option value="">Select an option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Calculate Risk</button>
+            </form>
+            <div id="results" class="mt-4 p-3 border rounded bg-light">
+                <h3>Risk Assessment Results</h3>
+                <p>Risk Level: <span id="riskLevel"></span></p>
+                <p>BMI: <span id="bmiResult"></span> (<span id="bmiCategory"></span>)</p>
+                <p><strong>Note:</strong> This is a simplified assessment. Consult healthcare professionals for a proper medical evaluation.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('riskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateRisk();
+        });
+
+        function calculateBMI(weight, height) {
+            const heightInMeters = height / 100;
+            return (weight / (heightInMeters * heightInMeters)).toFixed(1);
+        }
+
+        function getBMICategory(bmi) {
+            if (bmi < 18.5) return 'Underweight';
+            if (bmi < 25) return 'Normal weight';
+            if (bmi < 30) return 'Overweight';
+            return 'Obese';
+        }
+
+        function calculateRisk() {
+            let riskScore = 0;
+            const age = parseInt(document.getElementById('age').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const smoker = document.getElementById('smoker').value;
+            const familyHistory = document.getElementById('familyHistory').value;
+            const sunExposure = document.getElementById('sunExposure').value;
+            const exercise = document.getElementById('exercise').value;
+            const bmi = calculateBMI(weight, height);
+            const bmiCategory = getBMICategory(bmi);
+
+            if (age >= 60) riskScore += 3;
+            else if (age >= 40) riskScore += 2;
+            else if (age >= 20) riskScore += 1;
+
+            if (smoker === 'yes') riskScore += 3;
+            if (familyHistory === 'yes') riskScore += 2;
+            if (sunExposure === 'high') riskScore += 2;
+            if (exercise === 'no') riskScore += 1;
+            if (bmi > 30) riskScore += 2;
+            else if (bmi > 25) riskScore += 1;
+
+            let riskLevel;
+            let riskClass;
+            if (riskScore >= 10) {
+                riskLevel = 'HIGH';
+                riskClass = 'text-danger fw-bold';
+            } else if (riskScore >= 5) {
+                riskLevel = 'MODERATE';
+                riskClass = 'text-warning fw-bold';
+            } else {
+                riskLevel = 'LOW';
+                riskClass = 'text-success fw-bold';
+            }
+
+            document.getElementById('results').style.display = 'block';
+            setTimeout(() => document.getElementById('results').style.opacity = 1, 100);
+            document.getElementById('riskLevel').textContent = riskLevel;
+            document.getElementById('riskLevel').className = riskClass;
+            document.getElementById('bmiResult').textContent = bmi;
+            document.getElementById('bmiCategory').textContent = bmiCategory;
+        }
+    </script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
